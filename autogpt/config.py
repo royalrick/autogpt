@@ -96,6 +96,7 @@ class Config(metaclass=Singleton):
         self.memory_backend = os.getenv("MEMORY_BACKEND", "local")
         # Initialize the OpenAI API client
         openai.api_key = self.openai_api_key
+        openai.api_base = os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
 
     def get_azure_deployment_id_for_model(self, model: str) -> str:
         """

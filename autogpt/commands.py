@@ -163,17 +163,29 @@ def google_search(query, num_results=8):
 def google_official_search(query, num_results=8):
     """Return the results of a google search using the official Google API"""
     import json
+    import os
+    import httplib2
+    from httplib2 import socks
 
     from googleapiclient.discovery import build
     from googleapiclient.errors import HttpError
 
     try:
+        http = None
+        if os.getenv("HTTP_PROXY_HOST") and os.getenv("HTTP_PROXY_PORT"):
+            proxy_info = httplib2.ProxyInfo(
+                socks.PROXY_TYPE_HTTP,
+                os.getenv("HTTP_PROXY_HOST"),
+                int(os.getenv("HTTP_PROXY_PORT")),
+            )
+            http = httplib2.Http(timeout=3, proxy_info=proxy_info)
+
         # Get the Google API key and Custom Search Engine ID from the config file
         api_key = cfg.google_api_key
         custom_search_engine_id = cfg.custom_search_engine_id
 
         # Initialize the Custom Search API service
-        service = build("customsearch", "v1", developerKey=api_key)
+        service = build("customsearch", "v1", developerKey=api_key, http=http)
 
         # Send the search query and retrieve the results
         result = (
